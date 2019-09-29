@@ -203,6 +203,7 @@ from ansible.module_utils.network.panos.panos import get_connection
 
 try:
     from pandevice.network import EthernetInterface
+    from pandevice.network import AggregateInterface
     from pandevice.errors import PanDeviceError
 except ImportError:
     pass
@@ -297,6 +298,11 @@ def main():
     else:
         spec['create_dhcp_default_route'] = None
 
+    if module.params['if_name'].startswith('ae'):
+        is_aggregate = True
+        to_remove = ['link_duplex', 'link_speed', 'link_state', 'aggregate_group']
+        spec = {k: v for k, v in spec.items() if k not in to_remove}
+
     # Get other info.
     state = module.params['state']
     zone_name = module.params['zone_name']
@@ -328,14 +334,21 @@ def main():
 
     # Retrieve the current config.
     try:
-        interfaces = EthernetInterface.refreshall(
-            parent, add=False, matching_vsys=False)
+        if is_aggregate:
+            interfaces = AggregateInterface.refreshall(
+                parent, add=False, matching_vsys=False)
+        else:
+            interfaces = EthernetInterface.refreshall(
+                parent, add=False, matching_vsys=False)
     except PanDeviceError:
         e = get_exception()
         module.fail_json(msg=e.message)
 
     # Build the object based on the user spec.
-    eth = EthernetInterface(**spec)
+    if is_aggregate:
+        eth = AggregateInterface(**spec)
+    else:
+        eth = EthernetInterface(**spec)
     parent.add(eth)
 
     # Which action should we take on the interface?

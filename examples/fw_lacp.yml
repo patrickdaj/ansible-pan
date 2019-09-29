@@ -1,0 +1,47 @@
+- name: Configure LACP
+  hosts: my-firewall
+  connection: local
+  gather_facts: False
+
+  roles:
+    - role: PaloAltoNetworks.paloaltonetworks
+
+  tasks:
+  - name: Grab the credentials from ansible-vault
+    include_vars: 'firewall-secrets.yml'
+    no_log: 'yes'
+
+  - name: Configure ae1
+    panos_interface:
+      ip_address: '{{ ip_address }}'
+      username: '{{ username }}'
+      password: '{{ password }}'
+      if_name: "ae1"
+      mode: layer3
+      ip: 192.168.21.1/24
+      enable_dhcp: "false"
+      zone_name: "outside"
+      commit: "false"
+
+  - name: Set ethernet1/1 as aggregate
+    panos_interface:
+      ip_address: '{{ ip_address }}'
+      username: '{{ username }}'
+      password: '{{ password }}'
+      if_name: "ethernet1/1"
+      mode: "aggregate-group"
+      aggregate_group: "ae1"
+      vr_name:
+      commit: "false"
+
+  - name: Set ethernet1/2 as aggregate
+    panos_interface:
+      ip_address: '{{ ip_address }}'
+      username: '{{ username }}'
+      password: '{{ password }}'
+      if_name: "ethernet1/2"
+      mode: "aggregate-group"
+      aggregate_group: "ae1"
+      vr_name:
+      commit: "false"
+
