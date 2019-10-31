@@ -1,4 +1,4 @@
-- name: Configure LACP
+- name: Configure L3 subinterface on Aggregate
   hosts: my-firewall
   connection: local
   gather_facts: False
@@ -17,11 +17,8 @@
       if_name: "ae1"
       lacp_mode: "true"
       mode: layer3
-      ip: 192.168.21.1/24
-      enable_dhcp: "false"
-      zone_name: "outside"
-      state: "present"
       commit: "false"
+      state: "present"
 
   - name: Set ethernet1/1 as aggregate
     panos_interface:
@@ -29,8 +26,8 @@
       if_name: "ethernet1/1"
       mode: "aggregate-group"
       aggregate_group: "ae1"
-      state: "present"
       commit: "false"
+      state: "present"
 
   - name: Set ethernet1/2 as aggregate
     panos_interface:
@@ -38,5 +35,17 @@
       if_name: "ethernet1/2"
       mode: "aggregate-group"
       aggregate_group: "ae1"
-      state: "present"
       commit: "false"
+      state: "present"
+
+  - name: Set ae1.100
+    panos_l3_subinterface:
+      provider: "{{ provider }}"
+      if_name: "ae1.100"
+      tag: "100"
+      mode: "layer3"
+      zone_name: "inside"
+      vr_name: "vr-1"
+      ip: [ "192.168.1.1/24" ]
+      commit: "false"
+      state: "present"

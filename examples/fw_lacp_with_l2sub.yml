@@ -1,4 +1,4 @@
-- name: Configure LACP
+- name: Configure L2 subinterface
   hosts: my-firewall
   connection: local
   gather_facts: False
@@ -16,10 +16,7 @@
       provider: "{{ provider }}"
       if_name: "ae1"
       lacp_mode: "true"
-      mode: layer3
-      ip: 192.168.21.1/24
-      enable_dhcp: "false"
-      zone_name: "outside"
+      mode: layer2
       state: "present"
       commit: "false"
 
@@ -38,5 +35,15 @@
       if_name: "ethernet1/2"
       mode: "aggregate-group"
       aggregate_group: "ae1"
+      state: "present"
+      commit: "false"
+
+  - name: Set ae1.100
+    panos_l2_subinterface:
+      provider: "{{ provider }}"
+      if_name: "ae1.100"
+      tag: "100"
+      zone_name: "inside"
+      vlan_name: "inside_vlan"
       state: "present"
       commit: "false"

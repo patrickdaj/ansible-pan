@@ -166,6 +166,20 @@ options:
         description:
             - B(Removed)
             - Use I(state) instead.
+            lacp_enable (bool): Enables LACP
+    lacp_passive_pre_negotiation:
+        description: Enable LACP passive pre-negotiation
+        type: bool
+    lacp_rate:
+        description: Set LACP transmission-rate
+        choices:
+            - fast
+            - slow
+    lacp_mode:
+        description: Set LACP mode
+        choices:
+            - active
+            - passive
 '''
 
 EXAMPLES = '''
@@ -254,6 +268,10 @@ def main():
 
             # TODO(gfreeman) - remove in the next release.
             operation=dict(),
+            lacp_enabled=dict(type=bool),
+            lacp_passive_pre_negotiation=dict(type=bool),
+            lacp_rate=dict(choices=['fast', 'slow']),
+            lacp_mode=dict(choices=['active', 'passive'])
         ),
     )
     module = AnsibleModule(
@@ -301,6 +319,10 @@ def main():
     if module.params['if_name'].startswith('ae'):
         is_aggregate = True
         to_remove = ['link_duplex', 'link_speed', 'link_state', 'aggregate_group']
+        spec = {k: v for k, v in spec.items() if k not in to_remove}
+    else:
+        is_aggregate = False
+        to_remove = ['lacp_enabled', 'lacp_mode', 'lacp_rate', 'lacp_passive_pre_negotiation']
         spec = {k: v for k, v in spec.items() if k not in to_remove}
 
     # Get other info.
