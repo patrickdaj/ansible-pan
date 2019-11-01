@@ -15,8 +15,9 @@
     panos_interface:
       provider: "{{ provider }}"
       if_name: "ae1"
-      lacp_mode: "true"
+      lacp_enable: "true"
       mode: layer2
+      vr_name:
       state: "present"
       commit: "false"
 
@@ -41,9 +42,8 @@
   - name: Set ae1.100
     panos_l2_subinterface:
       provider: "{{ provider }}"
-      if_name: "ae1.100"
+      name: "ae1.100"
       tag: "100"
-      zone_name: "inside"
+      zone_name: "inside_l2"
       vlan_name: "inside_vlan"
       state: "present"
-      commit: "false"

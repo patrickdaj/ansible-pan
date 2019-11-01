@@ -16,11 +16,12 @@
       provider: "{{ provider }}"
       if_name: "ethernet1/1"
       mode: "layer3"
+      vr_name:
       state: "present"
       commit: "false"
 
   - name: ethernet1/1.100 as layer3
-    panos_l3_interface:
+    panos_l3_subinterface:
       provider: "{{ provider }}"
       name: "ethernet1/1.100"
       tag: 100
@@ -28,4 +29,3 @@
       vr_name: "vr-1"
       ip: [ "192.168.1.1/24" ]
       state: "present"
-      commit: "false"

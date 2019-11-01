@@ -166,7 +166,9 @@ options:
         description:
             - B(Removed)
             - Use I(state) instead.
-            lacp_enable (bool): Enables LACP
+    lacp_enable:
+        description: Enables LACP
+        type: bool
     lacp_passive_pre_negotiation:
         description: Enable LACP passive pre-negotiation
         type: bool
@@ -268,7 +270,7 @@ def main():
 
             # TODO(gfreeman) - remove in the next release.
             operation=dict(),
-            lacp_enabled=dict(type=bool),
+            lacp_enable=dict(type=bool),
             lacp_passive_pre_negotiation=dict(type=bool),
             lacp_rate=dict(choices=['fast', 'slow']),
             lacp_mode=dict(choices=['active', 'passive'])
@@ -318,7 +320,7 @@ def main():
 
     if module.params['if_name'].startswith('ae'):
         is_aggregate = True
-        to_remove = ['link_duplex', 'link_speed', 'link_state', 'aggregate_group']
+        to_remove = ['link_duplex', 'link_speed', 'link_state', 'aggregate_group', 'netflow_profile_l2']
         spec = {k: v for k, v in spec.items() if k not in to_remove}
     else:
         is_aggregate = False
